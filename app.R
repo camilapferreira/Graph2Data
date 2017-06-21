@@ -1,0 +1,73 @@
+#
+# This is a Shiny web application. You can run the application by clicking
+# the 'Run App' button above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    http://shiny.rstudio.com/
+#
+
+library(shiny)
+
+# To upload a file on the app
+
+server <- shinyServer(function(input, output) {
+  output$files <- renderTable(input$files)
+  
+  files <- reactive({
+    files <- input$files
+    files$datapath <- gsub("\\\\", "/", files$datapath)
+    files
+  })
+  
+  
+  output$images <- renderUI({
+    if(is.null(input$files)) return(NULL)
+    image_output_list <- 
+      lapply(1:nrow(files()),
+             function(i)
+             {
+               imagename = paste0("image", i)
+               imageOutput(imagename)
+             })
+    
+    do.call(tagList, image_output_list)
+  })
+  
+  observe({
+    if(is.null(input$files)) return(NULL)
+    for (i in 1:nrow(files()))
+    {
+      print(i)
+      local({
+        my_i <- i
+        imagename = paste0("image", my_i)
+        print(imagename)
+        output[[imagename]] <- 
+          renderImage({
+            list(src = files()$datapath[my_i],
+                 alt = "Image failed to render")
+          }, deleteFile = FALSE)
+      })
+    }
+  })
+  
+})
+
+ui <- shinyUI(fluidPage(
+  titlePanel("Uploading Files"),
+  sidebarLayout(
+    sidebarPanel(
+      fileInput(inputId = 'files', 
+                label = 'Select an Image',
+                multiple = TRUE,
+                accept=c('image/png', 'image/jpeg'))
+    ),
+    mainPanel(
+      tableOutput('files'),
+      uiOutput('images')
+    )
+  )
+))
+
+shinyApp(ui=ui,server=server)
