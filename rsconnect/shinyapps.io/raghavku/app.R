@@ -7,6 +7,7 @@
 #    http://shiny.rstudio.com/
 #
 
+library(rsconnect)
 library(shiny)
 
 # To upload a file on the app
@@ -55,7 +56,7 @@ server <- shinyServer(function(input, output) {
 })
 
 ui <- shinyUI(fluidPage(
-  titlePanel("Uploading Files"),
+  titlePanel("Graph2Data"),
   sidebarLayout(
     sidebarPanel(
       fileInput(inputId = 'files', 
@@ -69,5 +70,5 @@ ui <- shinyUI(fluidPage(
     )
   )
 ))
-
 shinyApp(ui=ui,server=server)
+rsconnect::deployApp()
