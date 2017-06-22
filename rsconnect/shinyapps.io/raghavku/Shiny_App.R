@@ -5,10 +5,10 @@
 #
 #    http://shiny.rstudio.com/
 #
-library(base)
+
 library(shiny)
 library(digitize)
-source("Graph2Data.R")
+
 # To upload a file on the app
 
 server <- shinyServer(function(input, output) {
@@ -17,6 +17,7 @@ server <- shinyServer(function(input, output) {
   files <- reactive({
     files <- input$files
     files$datapath <- gsub("\\\\", "/", files$datapath)
+    print("storing file name")
     files
   })
   
@@ -24,7 +25,7 @@ server <- shinyServer(function(input, output) {
     list(src = "graph.gif", 
          contentType = 'image/gif',
          width = 400,
-         height = 200
+         height = 300
     )
   }, deleteFile=FALSE)
   
@@ -42,8 +43,13 @@ server <- shinyServer(function(input, output) {
   })
   
   mode <- reactive({
-    mode <- input$mode
-    ReadAndCal(files)
+    # mode <- input$mode
+    # print("hello")
+    # mode
+    files <- input$files
+    files$datapath <- gsub("\\\\", "/", files$datapath)
+    print("storing file name")
+    files
   })
   
   observe({
@@ -86,7 +92,8 @@ ui <- shinyUI(fluidPage(
     ),
     mainPanel(
       tableOutput('files'),
-      uiOutput('images')
+      uiOutput('images'),
+      imageOutput("myImage")
     )
   )
 ))

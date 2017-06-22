@@ -1,0 +1,58 @@
+---
+title: "Graph2Data"
+author: "Raghav Kumar, Genc Geci, Camila Ferreira, Shaima Parveen, Timothy Lim"
+date: "June 22, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#' Extracts data points from a graph loaded into the function.
+#'
+#' @param file The graph we are extracting data values from.
+#' @return The data frame containing all x and y values for the major points of our graph.
+#' @description Load image of the graph and calibrate x and y axes.
+#' @export
+```
+Load required packages
+
+```{r}
+library(pipeR)
+library(magrittr)
+library(digitize)
+
+install.packages("pipeR")
+devtools::has_devel()
+```
+
+Load image to deconstruct into a dataset
+```{r}
+file <- "Train.png"
+```
+
+manualGraph uses functions from the digitize package (in CRAN). The locate function has been used from base R to detect the x and y axes.  
+```{r}
+manualGraph <- function(file){
+  Train = ReadAndCal(file) #Load image of the graph and calibrate x and y axis. 
+  #Click on x1,x2,y1,y2 respectively to load the axes.
+  print(data.frame(Train))
+  growth = DigitData(col='red') #Click on points within the graph that need to converted
+  data = Calibrate(growth, Train, 0,1,0,20) #Select the variable containing the point, axes, x1,x2,y1,y2
+  
+  plot(data, type='l') #Plot the data to check if it's representative of the image
+  data$x = as.integer(data$x + .5) #Convert points on x axis into integers
+  data$y = as.integer(data$y + .5) #Convert points on y axis into integers
+  
+  data <- data.frame(data)
+  
+  write.csv(data, file = "data.csv") #Returns the generated data frame in a csv format
+}
+```
+
+Run the function
+```{r}
+manualGraph
+```
